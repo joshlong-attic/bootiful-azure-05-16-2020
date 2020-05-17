@@ -2,10 +2,7 @@ package com.example.bootifulazure;
 
 import com.microsoft.azure.storage.blob.ContainerURL;
 import io.reactivex.Flowable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -18,6 +15,9 @@ import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Stream;
 
 @EnableBinding({Source.class, Sink.class})
 @SpringBootApplication
@@ -93,11 +94,48 @@ class SqlServerDemo {
         customers.forEach(customer -> log.info(customer.toString()));
     }
 
-    @AllArgsConstructor
-    @Data
-    public static class Customer {
-        public Integer id;
-        public String name;
+}
+
+
+@AllArgsConstructor
+@Data
+class Customer {
+    public Integer id;
+    public String name;
+}
+
+// CosmosDB
+
+@Log4j2
+@RequiredArgsConstructor
+@Component
+class CosmosDbDemo {
+
+    private final ReservationRepository reservationRepository;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void run() throws Exception {
+
+        reservationRepository.deleteAll();
+
+        Stream.of("A", "B", "C")
+                .map(name -> new Reservation(null, name))
+                .map(this.reservationRepository::save)
+                .forEach(log::info);
+
     }
 }
 
+interface ReservationRepository extends CrudRepository<Reservation, String> {
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Document(collection = "reservations")
+class Reservation {
+
+    @Id
+    private String id;
+    private String name;
+}
