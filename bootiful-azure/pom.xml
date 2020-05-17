@@ -47,7 +47,8 @@
         -->
         <dependency>
             <groupId>com.microsoft.azure</groupId>
-            <artifactId>spring-cloud-azure-servicebus-queue-stream-binder   </artifactId>
+            <artifactId>spring-cloud-azure-servicebus-queue-stream-binder
+            </artifactId>
             <version>1.2.5</version>
         </dependency>
         <dependency>
