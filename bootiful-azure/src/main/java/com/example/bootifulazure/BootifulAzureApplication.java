@@ -2,25 +2,32 @@ package com.example.bootifulazure;
 
 import com.microsoft.azure.storage.blob.ContainerURL;
 import io.reactivex.Flowable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.List;
 
 @EnableBinding({Source.class, Sink.class})
 @SpringBootApplication
@@ -46,6 +53,7 @@ class SpringCloudStreamServiceBusDemo {
 
     @StreamListener(Sink.INPUT)
     public void incoming(org.springframework.messaging.Message<?> message) {
+        log.info("------------------------------------------------------------------------");
         log.info("new message: " + message.getPayload());
         message.getHeaders().forEach((k, v) -> {
             log.info(k + '=' + v);
@@ -68,5 +76,27 @@ class ObjectStorageServiceDemo {
                 .upload(Flowable.just(ByteBuffer.wrap(bytes)), bytes.length, null, null, null, null)//
                 .blockingGet();
         log.info(blockBlobUploadResponse.toString());
+    }
+}
+
+@Log4j2
+@Component
+@RequiredArgsConstructor
+class SqlServerDemo {
+
+    private final JdbcOperations operations;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void init() {
+        List<Customer> customers = operations
+                .query("select * from CUSTOMERS", (rs, rowNum) -> new Customer(rs.getInt("id"), rs.getString("name")));
+        customers.forEach(customer -> log.info(customer.toString()));
+    }
+
+    @AllArgsConstructor
+    @Data
+    public static class Customer {
+        public Integer id;
+        public String name;
     }
 }
