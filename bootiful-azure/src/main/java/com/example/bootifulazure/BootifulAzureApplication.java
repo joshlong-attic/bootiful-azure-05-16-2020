@@ -67,8 +67,7 @@ class SpringCloudStreamServiceBusDemo {
 @Configuration
 class ObjectStorageServiceDemo {
 
-    // todo in order for this to work make sure that you click on the container ('cats'), choose 'Change Access Level',
-    //  and set it to 'Container (anonymouse read access for containers and blobs)'
+    // todo in order for this to work make sure that you click on the container ('cats'), choose 'Change Access Level', and set it to 'Container (anonymouse read access for containers and blobs)'
     @SneakyThrows
     ObjectStorageServiceDemo(ContainerURL containerURL, @Value("classpath:/cat.jpg") Resource cat) {
         var bytes = FileCopyUtils.copyToByteArray(cat.getFile());
