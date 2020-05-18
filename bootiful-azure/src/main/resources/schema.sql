@@ -1,4 +1,4 @@
--- drop table CUSTOMERS ;
+drop table CUSTOMERS ;
 if not exists(
         select name
         from sys.tables
@@ -10,4 +10,3 @@ CREATE TABLE CUSTOMERS
     name varchar(255) not null
 );
 go
-
