@@ -3,25 +3,21 @@ package com.example.bootifulazure;
 import com.microsoft.azure.storage.blob.ContainerURL;
 import io.reactivex.Flowable;
 import lombok.*;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.cloud.stream.messaging.Source;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -30,10 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.ByteBuffer;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.Instant;
-import java.util.List;
 import java.util.stream.Stream;
 
 @SpringBootApplication
@@ -90,6 +83,7 @@ class ObjectStorageServiceDemo {
 }
 
 
+@Data
 @RequiredArgsConstructor
 class Customer {
     public final Integer id;
@@ -106,7 +100,7 @@ class SqlServerDemo {
     @EventListener(ApplicationReadyEvent.class)
     public void begin() {
         var results = this.template.query(
-                "select * from CUSTOMERS", (rs, rowNum) -> new Customer(rs.getInt("id"), rs.getString("name")));
+                "select * from [dbo].[CUSTOMERS]", (rs, rowNum) -> new Customer(rs.getInt("id"), rs.getString("name")));
         results.forEach(log::info);
     }
 }

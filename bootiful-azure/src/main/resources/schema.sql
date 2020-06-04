@@ -1,4 +1,4 @@
-drop table CUSTOMERS ;
+-- drop table CUSTOMERS ;
 if not exists(
         select name
         from sys.tables
